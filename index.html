@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Random Exercise Picker</title>
+    <style>
+      body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+      button { font-size: 1.2em; padding: 10px 20px; margin-top: 20px; }
+      #result { margin-top: 30px; font-size: 1.5em; text-align: center; }
+    </style>
+  </head>
+  <body>
+    <h1>Random Exercise Picker</h1>
+    <button onclick="pickRandom()">Give Me One!</button>
+    <div id="result">Click the button for a random exercise.</div>
+
+    <script>
+      const exercises = [
+        "Do 10 push-ups.",
+        "Take a one-minute deep breathing session.",
+        "Stretch your arms overhead for 30 seconds.",
+        "Do 15 squats.",
+        "Take a short walk around the room."
+      ];
+
+      function pickRandom() {
+        const randomIndex = Math.floor(Math.random() * exercises.length);
+        document.getElementById('result').textContent = exercises[randomIndex];
+      }
+    </script>
+  </body>
+</html>
