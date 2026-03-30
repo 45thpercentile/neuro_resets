@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Exercise Plan</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        .controls {
+            background-color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .controls h2 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: #555;
+        }
+        .control-group {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        label {
+            font-size: 13px;
+            font-weight: normal;
+            color: #555;
+            white-space: nowrap;
+            min-width: 100px;
+        }
+        input[type="range"] {
+            flex: 1;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        .slider-value {
+            min-width: 40px;
+            text-align: right;
+            font-weight: bold;
+            color: #007bff;
+            font-size: 13px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 8px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #007bff;
+            margin-top: 0;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .exercise-list {
+            list-style: none;
+            padding: 0;
+        }
+        .exercise-list li {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+        }
+        .standing {
+            border-left-color: #28a745;
+        }
+        .floor {
+            border-left-color: #ffc107;
+        }
+        .mobility {
+            border-left-color: #17a2b8;
+        }
+        .strength {
+            border-left-color: #dc3545;
+        }
+        .exercise-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .standing .exercise-type {
+            background-color: #28a745;
+            color: white;
+        }
+        .floor .exercise-type {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .mobility .exercise-type {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .strength .exercise-type {
+            background-color: #dc3545;
+            color: white;
+        }
+        .empty-message {
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏋️ Daily Exercise Plan</h1>
+
+    <div class="controls">
+        <h2>Adjust Your Plan</h2>
+        <div class="control-group">
+            <label for="standingPercent">Standing:</label>
+            <div class="slider-container">
+                <input type="range" id="standingPercent" min="0" max="100" value="50">
+                <span class="slider-value" id="standingValue">50%</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="floorPercent">Floor:</label>
+            <div class="slider-container">
+                <input type="range" id="floorPercent" min="0" max="100" value="50">
+                <span class="slider-value" id="floorValue">50%</span>
+            </div>
+        </div>
+        <button onclick="generatePlan()">Generate Daily Plan</button>
+    </div>
+
+    <div id="exercisePlan"></div>
+
+    <script>
+        const exercises = {
+            "Mandatory": [
+                "s-Nerve glides",
+                "s-Forearm pronation on one leg",
+                "s-Doorway stretch",
+                "s-Bend forward, move arms",
+                "f-Childs pose",
+                "f-Lie on foam roller"
+            ],
+            "Mobility": [
+                "s-Crunch at thorasic back",
+                "s-Raise one arm and look up",
+                "s-Open books",
+                "s-Bow and arrows",
+                "f-Knee to chest stretch on foam roller",
+                "f-Figure 4 stretch on foam roller",
+                "f-1 arm up opposite leg straight foam roller",
+                "f-Cat cow",
+                "f-Bird dogs",
+                "f-Quadraped arm raise"
+            ],
+            "Strength": [
+                "f-Bridges",
+                "f-Fire hydrants",
+                "f-Clam shells",
+                "f-Scissors",
+                "f-Leg lifts",
+                "s-Stairs with ankle weights",
+                "s-Squat walk",
+                "s-Squat with stop",
+                "s-Lunge, bicep curl",
+                "s-Side step, inside leg up, curl",
+                "s-Curl, arm up"
+            ]
+        };
+
+        // Update slider value displays
+        document.getElementById('standingPercent').addEventListener('input', function() {
+            document.getElementById('standingValue').textContent = this.value + '%';
+        });
+
+        document.getElementById('floorPercent').addEventListener('input', function() {
+            document.getElementById('floorValue').textContent = this.value + '%';
+        });
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function selectExercises(exerciseList, standingPercent, floorPercent) {
+            const standing = exerciseList.filter(ex => ex.startsWith('s-'));
+            const floor = exerciseList.filter(ex => ex.startsWith('f-'));
+
+            const standingCount = Math.ceil(standing.length * (standingPercent / 100));
+            const floorCount = Math.ceil(floor.length * (floorPercent / 100));
+
+            const selectedStanding = shuffleArray(standing).slice(0, standingCount);
+            const selectedFloor = shuffleArray(floor).slice(0, floorCount);
+
+            return [...selectedStanding, ...selectedFloor];
+        }
+
+        function createExerciseElement(exercise, category = null) {
+            const li = document.createElement('li');
+            const exerciseName = exercise.substring(2);
+
+            if (category) {
+                // For mobility/strength exercises
+                li.className = category.toLowerCase();
+                li.innerHTML = `<span class="exercise-type">${category}</span>${exerciseName}`;
+            } else {
+                // For mandatory exercises, show standing/floor labels
+                const type = exercise.startsWith('s-') ? 'standing' : 'floor';
+                const typeLabel = exercise.startsWith('s-') ? 'Standing' : 'Floor';
+                li.className = type;
+                li.innerHTML = `<span class="exercise-type">${typeLabel}</span>${exerciseName}`;
+            }
+
+            return li;
+        }
+
+        function generatePlan() {
+            const standingPercent = parseInt(document.getElementById('standingPercent').value);
+            const floorPercent = parseInt(document.getElementById('floorPercent').value);
+
+            const planContainer = document.getElementById('exercisePlan');
+            planContainer.innerHTML = '';
+
+            // Mandatory section - always show all exercises
+            const mandatorySection = document.createElement('div');
+            mandatorySection.className = 'section';
+            mandatorySection.innerHTML = '<h2>Mandatory Exercises</h2>';
+            const mandatoryList = document.createElement('ul');
+            mandatoryList.className = 'exercise-list';
+
+            exercises.Mandatory.forEach(exercise => {
+                mandatoryList.appendChild(createExerciseElement(exercise));
+            });
+
+            mandatorySection.appendChild(mandatoryList);
+            planContainer.appendChild(mandatorySection);
+
+            // Select from Mobility and Strength separately to track categories
+            const selectedMobility = selectExercises(exercises.Mobility, standingPercent, floorPercent);
+            const selectedStrength = selectExercises(exercises.Strength, standingPercent, floorPercent);
+
+            // Create exercise objects with category info
+            const mobilityWithCategory = selectedMobility.map(ex => ({ exercise: ex, category: 'Mobility' }));
+            const strengthWithCategory = selectedStrength.map(ex => ({ exercise: ex, category: 'Strength' }));
+
+            // Combine and split by standing/floor
+            const allSelected = [...mobilityWithCategory, ...strengthWithCategory];
+            const selectedStanding = allSelected.filter(item => item.exercise.startsWith('s-'));
+            const selectedFloor = allSelected.filter(item => item.exercise.startsWith('f-'));
+
+            // Standing section
+            const standingSection = document.createElement('div');
+            standingSection.className = 'section';
+            standingSection.innerHTML = '<h2>Standing Exercises</h2>';
+            const standingList = document.createElement('ul');
+            standingList.className = 'exercise-list';
+
+            if (selectedStanding.length > 0) {
+                selectedStanding.forEach(item => {
+                    standingList.appendChild(createExerciseElement(item.exercise, item.category));
+                });
+            } else {
+                standingList.innerHTML = '<li class="empty-message">No exercises selected (adjust percentages above)</li>';
+            }
+
+            standingSection.appendChild(standingList);
+            planContainer.appendChild(standingSection);
+
+            // Floor section
+            const floorSection = document.createElement('div');
+            floorSection.className = 'section';
+            floorSection.innerHTML = '<h2>Floor Exercises</h2>';
+            const floorList = document.createElement('ul');
+            floorList.className = 'exercise-list';
+
+            if (selectedFloor.length > 0) {
+                selectedFloor.forEach(item => {
+                    floorList.appendChild(createExerciseElement(item.exercise, item.category));
+                });
+            } else {
+                floorList.innerHTML = '<li class="empty-message">No exercises selected (adjust percentages above)</li>';
+            }
+
+            floorSection.appendChild(floorList);
+            planContainer.appendChild(floorSection);
+        }
+
+        // Generate initial plan on page load
+        generatePlan();
+    </script>
+</body>
+</html>
