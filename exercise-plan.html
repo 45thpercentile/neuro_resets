@@ -145,17 +145,17 @@
     <div class="controls">
         <h2>Adjust Your Plan</h2>
         <div class="control-group">
-            <label for="standingPercent">Standing:</label>
+            <label for="mobilityPercent">Mobility:</label>
             <div class="slider-container">
-                <input type="range" id="standingPercent" min="0" max="100" value="50">
-                <span class="slider-value" id="standingValue">50%</span>
+                <input type="range" id="mobilityPercent" min="0" max="100" value="50">
+                <span class="slider-value" id="mobilityValue">50%</span>
             </div>
         </div>
         <div class="control-group">
-            <label for="floorPercent">Floor:</label>
+            <label for="strengthPercent">Strength:</label>
             <div class="slider-container">
-                <input type="range" id="floorPercent" min="0" max="100" value="50">
-                <span class="slider-value" id="floorValue">50%</span>
+                <input type="range" id="strengthPercent" min="0" max="100" value="50">
+                <span class="slider-value" id="strengthValue">50%</span>
             </div>
         </div>
         <button onclick="generatePlan()">Generate Daily Plan</button>
@@ -201,12 +201,12 @@
         };
 
         // Update slider value displays
-        document.getElementById('standingPercent').addEventListener('input', function() {
-            document.getElementById('standingValue').textContent = this.value + '%';
+        document.getElementById('mobilityPercent').addEventListener('input', function() {
+            document.getElementById('mobilityValue').textContent = this.value + '%';
         });
 
-        document.getElementById('floorPercent').addEventListener('input', function() {
-            document.getElementById('floorValue').textContent = this.value + '%';
+        document.getElementById('strengthPercent').addEventListener('input', function() {
+            document.getElementById('strengthValue').textContent = this.value + '%';
         });
 
         function shuffleArray(array) {
@@ -218,17 +218,9 @@
             return shuffled;
         }
 
-        function selectExercises(exerciseList, standingPercent, floorPercent) {
-            const standing = exerciseList.filter(ex => ex.startsWith('s-'));
-            const floor = exerciseList.filter(ex => ex.startsWith('f-'));
-
-            const standingCount = Math.ceil(standing.length * (standingPercent / 100));
-            const floorCount = Math.ceil(floor.length * (floorPercent / 100));
-
-            const selectedStanding = shuffleArray(standing).slice(0, standingCount);
-            const selectedFloor = shuffleArray(floor).slice(0, floorCount);
-
-            return [...selectedStanding, ...selectedFloor];
+        function selectExercises(exerciseList, percent) {
+            const count = Math.ceil(exerciseList.length * (percent / 100));
+            return shuffleArray(exerciseList).slice(0, count);
         }
 
         function createExerciseElement(exercise, category = null) {
@@ -251,8 +243,8 @@
         }
 
         function generatePlan() {
-            const standingPercent = parseInt(document.getElementById('standingPercent').value);
-            const floorPercent = parseInt(document.getElementById('floorPercent').value);
+            const mobilityPercent = parseInt(document.getElementById('mobilityPercent').value);
+            const strengthPercent = parseInt(document.getElementById('strengthPercent').value);
 
             const planContainer = document.getElementById('exercisePlan');
             planContainer.innerHTML = '';
@@ -271,9 +263,9 @@
             mandatorySection.appendChild(mandatoryList);
             planContainer.appendChild(mandatorySection);
 
-            // Select from Mobility and Strength separately to track categories
-            const selectedMobility = selectExercises(exercises.Mobility, standingPercent, floorPercent);
-            const selectedStrength = selectExercises(exercises.Strength, standingPercent, floorPercent);
+            // Select from Mobility and Strength based on their respective percentages
+            const selectedMobility = selectExercises(exercises.Mobility, mobilityPercent);
+            const selectedStrength = selectExercises(exercises.Strength, strengthPercent);
 
             // Create exercise objects with category info
             const mobilityWithCategory = selectedMobility.map(ex => ({ exercise: ex, category: 'Mobility' }));
