@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Exercise Plan 2</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        .controls {
+            background-color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .controls h2 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: #555;
+        }
+        .control-group {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        label {
+            font-size: 13px;
+            font-weight: normal;
+            color: #555;
+            white-space: nowrap;
+            min-width: 120px;
+        }
+        input[type="range"] {
+            flex: 1;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        .slider-value {
+            min-width: 40px;
+            text-align: right;
+            font-weight: bold;
+            color: #007bff;
+            font-size: 13px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 8px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #007bff;
+            margin-top: 0;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .exercise-list {
+            list-style: none;
+            padding: 0;
+        }
+        .exercise-list li {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+        }
+        .foam {
+            border-left-color: #6f42c1;
+        }
+        .balance {
+            border-left-color: #fd7e14;
+        }
+        .cardio {
+            border-left-color: #dc3545;
+        }
+        .exercise-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .foam .exercise-type {
+            background-color: #6f42c1;
+            color: white;
+        }
+        .balance .exercise-type {
+            background-color: #fd7e14;
+            color: white;
+        }
+        .cardio .exercise-type {
+            background-color: #dc3545;
+            color: white;
+        }
+        .exercise-name {
+            font-weight: bold;
+        }
+        .exercise-desc {
+            display: block;
+            margin-top: 4px;
+            color: #555;
+            font-size: 14px;
+        }
+        .empty-message {
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧘 Daily Exercise Plan 2</h1>
+
+    <div class="controls">
+        <h2>Adjust Your Plan</h2>
+        <div class="control-group">
+            <label for="foamPercent">Foam Roller:</label>
+            <div class="slider-container">
+                <input type="range" id="foamPercent" min="0" max="100" value="50">
+                <span class="slider-value" id="foamValue">50%</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="balancePercent">Balance & BOSU:</label>
+            <div class="slider-container">
+                <input type="range" id="balancePercent" min="0" max="100" value="50">
+                <span class="slider-value" id="balanceValue">50%</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="cardioPercent">Cardio:</label>
+            <div class="slider-container">
+                <input type="range" id="cardioPercent" min="0" max="100" value="50">
+                <span class="slider-value" id="cardioValue">50%</span>
+            </div>
+        </div>
+        <button onclick="generatePlan()">Generate Daily Plan</button>
+    </div>
+
+    <div id="exercisePlan"></div>
+
+    <script>
+        const exercises = {
+            "Foam Roller": [
+                { name: "Upper Body/Core", desc: "Lying on back with arms at 90 degrees and bending legs sideways." },
+                { name: "Core/Leg Integration", desc: "Lying on back with arms/elbows at 90-90, extending and bending legs." },
+                { name: "Decompression", desc: "Lying on back with knees resting on a chair while performing belly breathing." },
+                { name: "Seated Mobility", desc: "Long sitting with hands behind head, extending and bending knees." }
+            ],
+            "Balance & BOSU": [
+                { name: "Static Balance", desc: "Holding weights and balancing symmetrically with eyes open, then progressing to eyes closed." },
+                { name: "Dynamic Balance", desc: "Opposite arm curl and leg raises." }
+            ],
+            "Cardio": [
+                { name: "Jumping jacks", desc: "" },
+                { name: "Opposite knee-to-elbow touches", desc: "" },
+                { name: "Floor-to-standing transitions", desc: "" },
+                { name: "Stair training with weights", desc: "" }
+            ]
+        };
+
+        const categoryClasses = {
+            "Foam Roller": "foam",
+            "Balance & BOSU": "balance",
+            "Cardio": "cardio"
+        };
+
+        // Update slider value displays
+        document.getElementById('foamPercent').addEventListener('input', function() {
+            document.getElementById('foamValue').textContent = this.value + '%';
+        });
+
+        document.getElementById('balancePercent').addEventListener('input', function() {
+            document.getElementById('balanceValue').textContent = this.value + '%';
+        });
+
+        document.getElementById('cardioPercent').addEventListener('input', function() {
+            document.getElementById('cardioValue').textContent = this.value + '%';
+        });
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function selectExercises(exerciseList, percent) {
+            const count = Math.ceil(exerciseList.length * (percent / 100));
+            return shuffleArray(exerciseList).slice(0, count);
+        }
+
+        function createExerciseElement(exercise, category) {
+            const li = document.createElement('li');
+            li.className = categoryClasses[category];
+            const descHtml = exercise.desc
+                ? `<span class="exercise-desc">${exercise.desc}</span>`
+                : '';
+            li.innerHTML = `<span class="exercise-type">${category}</span><span class="exercise-name">${exercise.name}</span>${descHtml}`;
+            return li;
+        }
+
+        function renderSection(planContainer, title, items, category) {
+            const section = document.createElement('div');
+            section.className = 'section';
+            section.innerHTML = `<h2>${title}</h2>`;
+            const list = document.createElement('ul');
+            list.className = 'exercise-list';
+
+            if (items.length > 0) {
+                items.forEach(item => {
+                    list.appendChild(createExerciseElement(item, category));
+                });
+            } else {
+                list.innerHTML = '<li class="empty-message">No exercises selected (adjust percentage above)</li>';
+            }
+
+            section.appendChild(list);
+            planContainer.appendChild(section);
+        }
+
+        function generatePlan() {
+            const foamPercent = parseInt(document.getElementById('foamPercent').value);
+            const balancePercent = parseInt(document.getElementById('balancePercent').value);
+            const cardioPercent = parseInt(document.getElementById('cardioPercent').value);
+
+            const planContainer = document.getElementById('exercisePlan');
+            planContainer.innerHTML = '';
+
+            const selectedFoam = selectExercises(exercises["Foam Roller"], foamPercent);
+            const selectedBalance = selectExercises(exercises["Balance & BOSU"], balancePercent);
+            const selectedCardio = selectExercises(exercises["Cardio"], cardioPercent);
+
+            renderSection(planContainer, 'Foam Roller Exercises', selectedFoam, 'Foam Roller');
+            renderSection(planContainer, 'Balance & BOSU Training', selectedBalance, 'Balance & BOSU');
+            renderSection(planContainer, 'Cardio Exercises', selectedCardio, 'Cardio');
+        }
+
+        // Generate initial plan on page load
+        generatePlan();
+    </script>
+</body>
+</html>
